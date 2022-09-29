@@ -14,3 +14,5 @@
 *.csv
 *.xml
 /deprecated
+/1_extracted_code
+/2_todo
