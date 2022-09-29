@@ -304,7 +304,8 @@ def create_cloud_mask(im_QA, satname, cloud_mask_issue, collection):
                 cloud_values = [2800, 2804, 2808, 2812, 6896, 6900, 6904, 6908]
             elif satname in ['L4','L5','L7','L8']:
                 # 752, 756, 760, 764 = High confidence cloud
-                cloud_values = [752, 756, 760, 764]
+                #cloud_values = [752, 756, 760, 764]
+                cloud_values = [] # no cloud masking for Landsat
         elif collection == 'C02':
             # function to return flag for n-th bit
             def is_set(x, n):
@@ -314,10 +315,10 @@ def create_cloud_mask(im_QA, satname, cloud_mask_issue, collection):
             # cloud = bit 3 
             qa_values = np.unique(im_QA.flatten())
             cloud_values = []
-            for qaval in qa_values:
-                for k in [1,2,3]: # check the first 3 flags
-                    if is_set(qaval,k):
-                        cloud_values.append(qaval)
+            #for qaval in qa_values:  # no cloud masking for Landsat
+                #for k in [1,2,3]: # check the first 3 flags
+                    #if is_set(qaval,k):
+                        #cloud_values.append(qaval)
  
     # find which pixels have bits corresponding to cloud values
     cloud_mask = np.isin(im_QA, cloud_values)
