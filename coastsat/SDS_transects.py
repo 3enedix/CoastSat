@@ -180,7 +180,9 @@ def compute_intersection(output, transects, settings):
         contains the X and Y coordinates of each transect
     settings: dict with the following keys
         'along_dist': int
-            alongshore distance considered caluclate the intersection
+            alongshore distance considered to calculate the intersection in [m]
+        'max_dist_origin': int
+            maximum distance to the origin of the transect in [m]
               
     Returns:    
     -----------
@@ -211,8 +213,7 @@ def compute_intersection(output, transects, settings):
             # calculate the distance between shoreline points and the origin of the transect
             d_origin = np.array([np.linalg.norm(sl[k,:] - p1) for k in range(len(sl))])
             # find the shoreline points that are close to the transects and to the origin
-            # the distance to the origin is hard-coded here to 1 km 
-            idx_dist = np.logical_and(d_line <= settings['along_dist'], d_origin <= 1000)
+            idx_dist = np.logical_and(d_line <= settings['along_dist'], d_origin <= settings['max_dist_origin'])
             # find the shoreline points that are in the direction of the transect (within 90 degrees)
             temp_sl = sl - np.array(transects[key][0,:])
             phi_sl = np.array([np.arctan2(temp_sl[k,1], temp_sl[k,0]) for k in range(len(temp_sl))])
@@ -223,6 +224,7 @@ def compute_intersection(output, transects, settings):
             
             # in case there are no shoreline points close to the transect 
             if len(idx_close) == 0:
+                #pdb.set_trace()
                 intersections[i,j] = np.nan
             else:
                 # change of base to shore-normal coordinate system
@@ -253,8 +255,8 @@ def compute_intersection_QC(output, transects, settings):
             transect).
         settings: dict
                 'along_dist': int (in metres)
-                    alongshore distance to caluclate the intersection (median of points 
-                    within this distance). 
+                    alongshore distance to calculate the intersection (median of points 
+                    within this distance) in [m]
                 'min_points': int 
                     minimum number of shoreline points to calculate an intersections
                 'max_std': int (in metres)
@@ -268,6 +270,8 @@ def compute_intersection_QC(output, transects, settings):
                     accepted, beyond this point a NaN is returned
                 'multiple_inter': mode for removing outliers ('auto', 'nan', 'max')
                 'prc_multiple': percentage to use in 'auto' mode to switch from 'nan' to 'max'
+                'max_dist_origin': int
+                    maximum distance to the origin of the transect in [m]
                         
     Returns:    
     -----------
@@ -312,8 +316,7 @@ def compute_intersection_QC(output, transects, settings):
             # calculate the distance between shoreline points and the origin of the transect
             d_origin = np.array([np.linalg.norm(sl[k,:] - p1) for k in range(len(sl))])
             # find the shoreline points that are close to the transects and to the origin
-            # the distance to the origin is hard-coded here to 1 km 
-            idx_dist = np.logical_and(d_line <= along_dist, d_origin <= 1000)
+            idx_dist = np.logical_and(d_line <= along_dist, d_origin <= settings['max_dist_origin'])
             idx_close = np.where(idx_dist)[0]
             
             # in case there are no shoreline points close to the transect 
